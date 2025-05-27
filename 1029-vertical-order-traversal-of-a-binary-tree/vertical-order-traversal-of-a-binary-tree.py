@@ -6,25 +6,39 @@
 #         self.right = right
 class Solution:
     def verticalTraversal(self, root: Optional[TreeNode]) -> List[List[int]]:
-        node_list = []  # Each element: (col, row, val)
-        queue = deque([(root, 0, 0)])  # node, row, col
+        
+        if root is None:
+            return []
+        origin = (0,0)
+        coordinates = []
+        node_values = {} # here key is column value
 
-        while queue:
-            node, row, col = queue.popleft()
-            if node:
-                node_list.append((col, row, node.val))
-                queue.append((node.left, row + 1, col - 1))
-                queue.append((node.right, row + 1, col + 1))
         
-        # Step 2: Sort by col, row, value
-        node_list.sort()
+
+        def dfs(root,point):
+            if not root:
+                return
+            else:
+                
+                
+                coordinates.append([point[0],point[1],root.val])
+            dfs(root.left, (point[0]+1, point[1]-1))
+            dfs(root.right, (point[0]+1, point[1]+1))
+
+        dfs(root, origin)
+
+        coordinates.sort()
+        node_values = {}
+        for r,c,v in coordinates:
+            if c in node_values:
+                node_values[c].append(v)
+            else:
+                node_values[c] = [v]
+
+
+        node_values = dict(sorted(node_values.items()))
+
+
         
-        # Step 3: Group by col
-        res = []
-        prev_col = float('-inf')
-        for col, row, value in node_list:
-            if col != prev_col:
-                res.append([])
-                prev_col = col
-            res[-1].append(value)
-        return res
+        return list(node_values.values())
+
